@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:verydeli_commerce/app/data/models/polling_response.dart';
 import 'package:verydeli_commerce/app/modules/home/home_repository.dart';
 
 class HomeController extends GetxController {
@@ -15,13 +16,18 @@ class HomeController extends GetxController {
   set setDeliveryNotificationIsVisible(bool value) => deliveryNotificationIsVisible.value = value;
 
   final toDelivery = [].obs;
-  get getToDelivery => toDelivery;
+  List get getToDelivery => toDelivery.toList();
   set setToDelivery(List value) => toDelivery.value = value;
   addToDelivery(value) => toDelivery.add(value);
 
+  List<PollingResponse> polling = [];
+
   @override
   void onInit() async {
+    String token = '';
+
     await _homeRepository.authorization().then((value) {
+      token = value.result['accessToken'] ?? '';
       _storage.write('accessToken', value.result['accessToken']);
     }).catchError((_) async {
       if (_.message != '') {
@@ -29,15 +35,23 @@ class HomeController extends GetxController {
       }
     });
 
-    Timer.periodic(const Duration(seconds: 30), (Timer t) async {
-      await _homeRepository.polling().then((value) {
-        for (var element in value.result) {
-          addToDelivery(element['orderId']);
-        }
-      }).catchError((_) {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_)));
+    if (token != '') {
+      Timer.periodic(const Duration(seconds: 30), (Timer t) async {
+        await _homeRepository.polling().then((value) {
+          for (var element in value.result) {
+            var values = PollingResponse.fromMap(element);
+            polling.add(values);
+            // addToDelivery(element['orderId']);
+          }
+        }).catchError((_) {
+          ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.message)));
+        });
+
+        await _homeRepository.acknowledgment(getToDelivery).catchError((_) {
+          ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.message)));
+        });
       });
-    });
+    }
 
     super.onInit();
   }

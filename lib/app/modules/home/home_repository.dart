@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:get_storage/get_storage.dart';
@@ -52,11 +54,43 @@ class HomeRepository extends GetConnect {
         // query: {'types': 'DSP'},
       );
 
-      if (response.statusCode != HttpStatus.ok && response.statusCode != HttpStatus.noContent) {
-        throw RestClientException('Erro!', code: response.statusCode);
+      switch (response.statusCode) {
+        case HttpStatus.ok:
+          return ApiResponse(result: response.body ?? []);
+        case HttpStatus.noContent:
+          return ApiResponse(result: response.body ?? []);
+        default:
+          throw RestClientException('Polling error!', code: response.statusCode);
+      }
+    } on RestClientException catch (exception) {
+      throw RestClientException(exception.message, code: exception.code);
+    }
+  }
+
+  Future<ApiResponse> acknowledgment(List pollingId) async {
+    try {
+      final map = [];
+      String mapJson = '';
+      final token = _storage.read('accessToken') ?? '';
+
+      for (var element in pollingId) {
+        map.add({'id': element});
       }
 
-      return ApiResponse(result: response.body ?? []);
+      mapJson = json.encode(map);
+
+      final response = await _restClient.postApi(
+        '/order/v1.0/events/acknowledgment',
+        mapJson,
+        headers: {'authorization': 'Bearer $token'},
+      );
+
+      switch (response.statusCode) {
+        case HttpStatus.accepted:
+          return ApiResponse();
+        default:
+          throw RestClientException('acknowledgment error!', code: response.statusCode);
+      }
     } on RestClientException catch (exception) {
       throw RestClientException(exception.message, code: exception.code);
     }
