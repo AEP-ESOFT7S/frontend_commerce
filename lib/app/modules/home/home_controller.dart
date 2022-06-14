@@ -15,12 +15,27 @@ class HomeController extends GetxController {
   get getDeliveryNotificationIsVisible => deliveryNotificationIsVisible.value;
   set setDeliveryNotificationIsVisible(bool value) => deliveryNotificationIsVisible.value = value;
 
-  final toDelivery = [].obs;
-  List get getToDelivery => toDelivery.toList();
-  set setToDelivery(List value) => toDelivery.value = value;
-  addToDelivery(value) => toDelivery.add(value);
+  final _pollings = <PollingResponse>[].obs;
+  List<PollingResponse> get getPollings => _pollings.toList();
+  void addPolling(PollingResponse value) {
+    getPollings.singleWhere(
+      (element) => element.orderId == value.orderId,
+      orElse: () {
+        _pollings.add(value);
+        return value;
+      },
+    );
+  }
 
-  List<PollingResponse> polling = [];
+  final _orders = [].obs;
+  List get getOrders => _orders.toList();
+  set setOrders(List value) => _orders.value = value;
+  void addOrders(String value) {
+    if (_orders.contains(value)) {
+      return;
+    }
+    _orders.add(value);
+  }
 
   @override
   void onInit() async {
@@ -31,7 +46,7 @@ class HomeController extends GetxController {
       _storage.write('accessToken', value.result['accessToken']);
     }).catchError((_) async {
       if (_.message != '') {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.message)));
+        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.toString())));
       }
     });
 
@@ -40,16 +55,22 @@ class HomeController extends GetxController {
         await _homeRepository.polling().then((value) {
           for (var element in value.result) {
             var values = PollingResponse.fromMap(element);
-            polling.add(values);
-            // addToDelivery(element['orderId']);
+            addPolling(values);
+            _storage.write('pollings', getPollings);
+            if (values.code == 'CFM') {
+              addOrders(values.orderId);
+              _storage.write('orders', getOrders);
+            }
           }
         }).catchError((_) {
           ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.message)));
         });
 
-        await _homeRepository.acknowledgment(getToDelivery).catchError((_) {
-          ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.message)));
-        });
+        if (getPollings.isNotEmpty) {
+          await _homeRepository.acknowledgment(getPollings).then((value) {}).catchError((erro) {
+            ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(erro.message)));
+          });
+        }
       });
     }
 
@@ -60,4 +81,12 @@ class HomeController extends GetxController {
 
   int get getCurrentIndex => _index.value;
   set setCurrentIndex(int value) => _index.value = value;
+
+  Future<void> confirm(String orderId) async {
+    await _homeRepository.confirmOrder(orderId).then((value) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(const SnackBar(content: Text('Confirmado!')));
+    }).catchError((_) {
+      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.message)));
+    });
+  }
 }

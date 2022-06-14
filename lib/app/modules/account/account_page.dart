@@ -21,7 +21,7 @@ class AccountPage extends GetView<AccountController> {
         child: Obx(
           () => BottomNavigationBar(
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.delivery_dining), label: 'Entregas'),
+              BottomNavigationBarItem(icon: Icon(Icons.fastfood), label: 'Pedidos'),
               BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Conta'),
             ],
             currentIndex: controller.getCurrentIndex,

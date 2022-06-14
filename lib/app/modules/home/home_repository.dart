@@ -5,6 +5,7 @@ import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:verydeli_commerce/app/core/exceptions/rest_client_exception.dart';
 import 'package:verydeli_commerce/app/data/models/api_response.dart';
+import 'package:verydeli_commerce/app/data/models/polling_response.dart';
 import 'package:verydeli_commerce/app/data/provider/api_provider.dart';
 import 'package:verydeli_commerce/app/modules/account/account_controller.dart';
 
@@ -46,12 +47,11 @@ class HomeRepository extends GetConnect {
 
   Future<ApiResponse> polling() async {
     try {
-      final token = _storage.read('accessToken') ?? '';
+      final String token = _storage.read('accessToken') ?? '';
 
       final response = await _restClient.getApi(
         '/order/v1.0/events:polling',
         headers: {'authorization': 'Bearer $token'},
-        // query: {'types': 'DSP'},
       );
 
       switch (response.statusCode) {
@@ -67,21 +67,19 @@ class HomeRepository extends GetConnect {
     }
   }
 
-  Future<ApiResponse> acknowledgment(List pollingId) async {
+  Future<ApiResponse> acknowledgment(List<PollingResponse> pollings) async {
     try {
-      final map = [];
-      String mapJson = '';
-      final token = _storage.read('accessToken') ?? '';
-
-      for (var element in pollingId) {
-        map.add({'id': element});
+      String json = '';
+      for (var element in pollings) {
+        var map = '{"id": "${element.id}"}';
+        json += json.isEmpty ? map : ', $map';
       }
 
-      mapJson = json.encode(map);
+      final token = _storage.read('accessToken') ?? '';
 
       final response = await _restClient.postApi(
         '/order/v1.0/events/acknowledgment',
-        mapJson,
+        '[$json]',
         headers: {'authorization': 'Bearer $token'},
       );
 
@@ -108,9 +106,9 @@ class HomeRepository extends GetConnect {
 
       switch (response.statusCode) {
         case HttpStatus.accepted:
-          return ApiResponse(result: response.body);
+          return ApiResponse(result: response.body, message: response.statusText!);
         default:
-          throw RestClientException('Erro!', code: response.statusCode);
+          throw RestClientException('Erro ao confirmar pedido!', code: response.statusCode);
       }
     } on RestClientException catch (exception) {
       throw RestClientException(exception.message, code: exception.code);

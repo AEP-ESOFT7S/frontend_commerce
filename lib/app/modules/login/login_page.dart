@@ -27,13 +27,13 @@ class LoginPage extends GetView<LoginController> {
                   textCapitalization: TextCapitalization.none,
                   textInputAction: TextInputAction.next,
                   decoration: const InputDecoration(labelText: 'Email'),
-                  // validator: (value) => validateEmail(value!),
+                  validator: (value) => validateEmail(value!),
                 ),
                 const SizedBox(height: 10),
                 Obx(
                   () => TextFormField(
                     decoration: const InputDecoration(labelText: 'Senha'),
-                    // validator: (value) => validateNotNull(value!),
+                    validator: (value) => validateNotNull(value!),
                     obscureText: controller.getIsObscure,
                   ),
                 ),

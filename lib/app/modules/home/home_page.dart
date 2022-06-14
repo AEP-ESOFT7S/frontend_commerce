@@ -8,7 +8,7 @@ class HomePage extends GetView<HomeController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(title: const Text('Pedidos')),
       drawer: Drawer(
         child: ListView(
           children: [
@@ -21,7 +21,7 @@ class HomePage extends GetView<HomeController> {
         child: Obx(
           () => BottomNavigationBar(
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.delivery_dining), label: 'Entregas'),
+              BottomNavigationBarItem(icon: Icon(Icons.fastfood), label: 'Pedidos'),
               BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Conta'),
             ],
             currentIndex: controller.getCurrentIndex,
@@ -38,17 +38,46 @@ class HomePage extends GetView<HomeController> {
         ),
       ),
       body: SafeArea(
-        child: Obx(
-          () => ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            itemCount: controller.getToDelivery.length,
-            itemBuilder: (context, index) {
-              return ElevatedButton(
-                onPressed: () {},
-                child: Text(controller.getToDelivery[index]),
-              );
-            },
-          ),
+        child: ListView(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+          children: [
+            const Text('Pendentes'),
+            SizedBox(
+              child: Obx(
+                () => ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  itemCount: controller.getPollings.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return ElevatedButton(
+                      onPressed: () {
+                        controller.confirm(controller.getPollings[index].orderId);
+                      },
+                      child: Text(controller.getPollings[index].orderId),
+                    );
+                  },
+                ),
+              ),
+            ),
+            const Text('Confirmados'),
+            SizedBox(
+              child: Obx(
+                () => ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  itemCount: controller.getOrders.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return ElevatedButton(
+                      onPressed: () {
+                        controller.confirm(controller.getOrders[index]);
+                      },
+                      child: Text(controller.getOrders[index]),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

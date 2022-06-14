@@ -21,7 +21,7 @@ class PollingResponse {
       'orderId': orderId,
       'code': code,
       'fullCode': fullCode,
-      'createdAt': createdAt.millisecondsSinceEpoch,
+      'createdAt': createdAt.toString(),
     };
   }
 
@@ -31,7 +31,7 @@ class PollingResponse {
       orderId: map['orderId'] ?? '',
       code: map['code'] ?? '',
       fullCode: map['fullCode'] ?? '',
-      createdAt: DateTime(map['createdAt']),
+      createdAt: DateTime.parse(map['createdAt']).toLocal(),
     );
   }
 
