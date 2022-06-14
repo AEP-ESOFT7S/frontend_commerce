@@ -15,6 +15,20 @@ class HomeController extends GetxController {
   get getDeliveryNotificationIsVisible => deliveryNotificationIsVisible.value;
   set setDeliveryNotificationIsVisible(bool value) => deliveryNotificationIsVisible.value = value;
 
+  final _registerCommerceNotificationIsVisible = false.obs;
+  get getRegisterCommerceNotificationIsVisible => _registerCommerceNotificationIsVisible.value;
+  toggleRegisterCommerceNotificationIsVisible() {
+    _registerCommerceNotificationIsVisible.toggle();
+  }
+
+  final registerCommerceMessage = 'Conta ainda sem vínculo a um comércio!';
+
+  final _placed = [].obs;
+  final _confirmed = [].obs;
+  final _despatched = [].obs;
+  final _concluded = [].obs;
+  final _canceled = [].obs;
+
   final _pollings = <PollingResponse>[].obs;
   List<PollingResponse> get getPollings => _pollings.toList();
   void addPolling(PollingResponse value) {
@@ -46,7 +60,12 @@ class HomeController extends GetxController {
       _storage.write('accessToken', value.result['accessToken']);
     }).catchError((_) async {
       if (_.message != '') {
-        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.toString())));
+        if (_.code == 0) {
+          toggleRegisterCommerceNotificationIsVisible();
+        } else {
+          toggleRegisterCommerceNotificationIsVisible();
+          ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.message)));
+        }
       }
     });
 
@@ -78,9 +97,10 @@ class HomeController extends GetxController {
   }
 
   final _index = 0.obs;
-
   int get getCurrentIndex => _index.value;
   set setCurrentIndex(int value) => _index.value = value;
+
+  insertOnSpecificList() {}
 
   Future<void> confirm(String orderId) async {
     await _homeRepository.confirmOrder(orderId).then((value) {

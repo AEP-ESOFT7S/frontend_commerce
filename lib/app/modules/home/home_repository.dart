@@ -1,13 +1,11 @@
-import 'dart:convert';
-
 import 'package:get/get.dart';
 import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:verydeli_commerce/app/core/exceptions/rest_client_exception.dart';
 import 'package:verydeli_commerce/app/data/models/api_response.dart';
 import 'package:verydeli_commerce/app/data/models/polling_response.dart';
+import 'package:verydeli_commerce/app/data/models/register_response.dart';
 import 'package:verydeli_commerce/app/data/provider/api_provider.dart';
-import 'package:verydeli_commerce/app/modules/account/account_controller.dart';
 
 class HomeRepository extends GetConnect {
   final APIProvider _restClient = APIProvider(url: 'https://merchant-api.ifood.com.br');
@@ -16,20 +14,20 @@ class HomeRepository extends GetConnect {
 
   Future<ApiResponse> authorization() async {
     try {
-      final credentials = await _storage.read('credentials');
+      final userData = await _storage.read('userData');
 
-      if (credentials == null) {
-        throw RestClientException('Sistema ainda sem vinculo a um comercio!');
+      RegisterResponse register = RegisterResponse.fromJson(userData);
+
+      if (register.clientId!.isEmpty && register.clientSecret!.isEmpty) {
+        throw RestClientException('Conta ainda sem vínculo a um comércio!', code: 0);
       }
-
-      IFoodCredentials? credential = IFoodCredentials.fromJson(credentials);
 
       final response = await _restClient.postApi(
         '/authentication/v1.0/oauth/token',
         {
           'grantType': 'client_credentials',
-          'clientId': credential.clientId,
-          'clientSecret': credential.clientSecret,
+          'clientId': register.clientId,
+          'clientSecret': register.clientSecret,
         },
         contentType: 'application/x-www-form-urlencoded',
       );

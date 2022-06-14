@@ -1,12 +1,9 @@
 import 'package:get/get.dart';
-// import 'package:get_storage/get_storage.dart';
 import 'package:verydeli_commerce/app/core/settings/settings.dart';
 
 class APIProvider extends GetConnect {
-  // final _storageAuth = GetStorage();
-
   APIProvider({String? url}) {
-    httpClient.baseUrl = url ?? Settings.baseUrl + Settings.api;
+    httpClient.baseUrl = url ?? Settings.baseUrl + Settings.api + Settings.id;
   }
 
   Future<Response> getApi(String path, {Map<String, String>? headers, Map<String, String>? query}) {

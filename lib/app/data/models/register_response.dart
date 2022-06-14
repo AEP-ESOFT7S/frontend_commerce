@@ -1,9 +1,12 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
 class RegisterResponse {
   final String id;
   final String firstName;
   final String lastName;
+  final String cpf;
+  final String phone;
   final String cep;
   final String city;
   final String neighborhood;
@@ -12,11 +15,16 @@ class RegisterResponse {
   final String complement;
   final String email;
   final String password;
+  String? clientId;
+  String? clientSecret;
+  final String type;
 
   RegisterResponse({
     required this.id,
     required this.firstName,
     required this.lastName,
+    required this.cpf,
+    required this.phone,
     required this.cep,
     required this.city,
     required this.neighborhood,
@@ -25,13 +33,18 @@ class RegisterResponse {
     required this.complement,
     required this.email,
     required this.password,
+    this.clientId,
+    this.clientSecret,
+    required this.type,
   });
 
   Map<String, dynamic> toMap() {
-    return {
+    return <String, dynamic>{
       '_id': id,
       'firstName': firstName,
       'lastName': lastName,
+      'cpf': cpf,
+      'phone': phone,
       'cep': cep,
       'city': city,
       'neighborhood': neighborhood,
@@ -40,26 +53,35 @@ class RegisterResponse {
       'complement': complement,
       'email': email,
       'password': password,
+      'clientId': clientId,
+      'clientSecret': clientSecret,
+      'type': type,
     };
   }
 
   factory RegisterResponse.fromMap(Map<String, dynamic> map) {
     return RegisterResponse(
-      id: map['_id'] ?? '',
-      firstName: map['firstName'] ?? '',
-      lastName: map['lastName'] ?? '',
-      cep: map['cep'] ?? '',
-      city: map['city'] ?? '',
-      neighborhood: map['neighborhood'] ?? '',
-      address: map['address'] ?? '',
-      number: map['number'] ?? '',
-      complement: map['complement'] ?? '',
-      email: map['email'] ?? '',
-      password: map['password'] ?? '',
+      id: map['_id'] as String,
+      firstName: map['firstName'] as String,
+      lastName: map['lastName'] as String,
+      cpf: map['cpf'] as String,
+      phone: map['phone'] as String,
+      cep: map['cep'] as String,
+      city: map['city'] as String,
+      neighborhood: map['neighborhood'] as String,
+      address: map['address'] as String,
+      number: map['number'] as String,
+      complement: map['complement'] as String,
+      email: map['email'] as String,
+      password: map['password'] as String,
+      clientId: map['clientId'] != null ? map['clientId'] as String : null,
+      clientSecret: map['clientSecret'] != null ? map['clientSecret'] as String : null,
+      type: map['type'] as String,
     );
   }
 
   String toJson() => json.encode(toMap());
 
-  factory RegisterResponse.fromJson(String source) => RegisterResponse.fromMap(json.decode(source));
+  factory RegisterResponse.fromJson(String source) =>
+      RegisterResponse.fromMap(json.decode(source) as Map<String, dynamic>);
 }

@@ -24,23 +24,24 @@ class RegisterController extends GetxController {
 
   Future<void> register() async {
     if (formKey.currentState!.validate()) {
-      await _registerRepository
-          .register(
-        RegisterRequest(
-          firstName: firstNameController.text,
-          lastName: lastNameController.text,
-          cep: cepController.text,
-          city: cityController.text,
-          neighborhood: neighborhoodController.text,
-          address: addressController.text,
-          number: numberController.text,
-          complement: complementController.text,
-          email: emailController.text,
-          password: passwordController.text,
-        ),
-      )
-          .then((value) {
-        Get.offAllNamed('/home');
+      final user = RegisterRequest(
+        firstName: firstNameController.text,
+        lastName: lastNameController.text,
+        cpf: cpfController.text,
+        phone: phoneController.text,
+        cep: cepController.text,
+        city: cityController.text,
+        neighborhood: neighborhoodController.text,
+        address: addressController.text,
+        number: numberController.text,
+        complement: complementController.text,
+        email: emailController.text,
+        password: passwordController.text,
+        type: 'commerce',
+      );
+
+      await _registerRepository.register(user.toJson()).then((value) {
+        Get.offAllNamed('/login');
         ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(value.message)));
       }).catchError((error) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(error.message)));
