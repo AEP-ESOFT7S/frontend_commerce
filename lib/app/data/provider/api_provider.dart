@@ -6,11 +6,11 @@ class APIProvider extends GetConnect {
     httpClient.baseUrl = url ?? Settings.baseUrl;
   }
 
-  Future<Response> getApi(String path, {Map<String, String>? headers, Map<String, String>? query}) {
-    return get(path, headers: headers, query: query);
-  }
+  // Future<Response> getApi(String path, {Map<String, String>? headers, Map<String, String>? query}) {
+  //   return get(path, headers: headers, query: query);
+  // }
 
-  Future<Response> postApi(String path, dynamic data,
-          {Map<String, String>? headers, String? contentType}) =>
-      post(path, data, headers: headers, contentType: contentType);
+  // Future<Response> postApi(String path, dynamic data,
+  //         {Map<String, String>? headers, String? contentType}) =>
+  //     post(path, data, headers: headers, contentType: contentType);
 }

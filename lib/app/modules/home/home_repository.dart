@@ -13,7 +13,7 @@ class HomeRepository extends GetConnect {
 
   Future<ApiResponse> authorization(RegisterResponse user) async {
     try {
-      final response = await _restClient.postApi(
+      final response = await _restClient.post(
         '/authentication/v1.0/oauth/token',
         {
           'grantType': 'client_credentials',
@@ -36,7 +36,7 @@ class HomeRepository extends GetConnect {
 
   Future<ApiResponse> polling(String accessToken) async {
     try {
-      final response = await _restClient.getApi(
+      final response = await _restClient.get(
         '/order/v1.0/events:polling',
         headers: {
           'authorization': 'Bearer $accessToken',
@@ -59,7 +59,7 @@ class HomeRepository extends GetConnect {
 
   Future<ApiResponse> acknowledgment(String accessToken, String pollings) async {
     try {
-      final response = await _restClient.postApi(
+      final response = await _restClient.post(
         '/order/v1.0/events/acknowledgment',
         '[$pollings]',
         headers: {'authorization': 'Bearer $accessToken'},
@@ -80,7 +80,7 @@ class HomeRepository extends GetConnect {
     try {
       final token = _storage.read('accessToken') ?? '';
 
-      final response = await _restClient.postApi(
+      final response = await _restClient.post(
         '/order/v1.0/orders/$orderId/confirm',
         null,
         headers: {'authorization': 'Bearer $token'},
@@ -101,7 +101,7 @@ class HomeRepository extends GetConnect {
     try {
       final token = _storage.read('accessToken') ?? '';
 
-      final response = await _restClient.postApi(
+      final response = await _restClient.post(
         '/order/v1.0/orders/$orderId/dispatch',
         null,
         headers: {'authorization': 'Bearer $token'},

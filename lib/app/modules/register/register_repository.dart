@@ -9,7 +9,7 @@ class RegisterRepository extends GetConnect {
 
   Future<ApiResponse> register(String registerData) async {
     try {
-      final response = await _restClient.postApi('/users', registerData);
+      final response = await _restClient.post('/users', registerData);
 
       switch (response.statusCode) {
         case HttpStatus.ok:

@@ -14,7 +14,7 @@ class LoginRepository extends GetConnect {
 
   Future<ApiResponse> login(String email) async {
     try {
-      final response = await _restClient.getApi('/users/$email');
+      final response = await _restClient.get('/users/$email');
 
       switch (response.statusCode) {
         case HttpStatus.ok:
