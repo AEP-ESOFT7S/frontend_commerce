@@ -3,7 +3,7 @@ import 'package:verydeli_commerce/app/core/settings/settings.dart';
 
 class APIProvider extends GetConnect {
   APIProvider({String? url}) {
-    httpClient.baseUrl = url ?? Settings.baseUrl + Settings.api + Settings.id;
+    httpClient.baseUrl = url ?? Settings.baseUrl;
   }
 
   Future<Response> getApi(String path, {Map<String, String>? headers, Map<String, String>? query}) {
