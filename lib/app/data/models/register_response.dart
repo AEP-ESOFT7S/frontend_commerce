@@ -17,6 +17,7 @@ class RegisterResponse {
   final String password;
   String? clientId;
   String? clientSecret;
+  String? merchantId;
   final String type;
 
   RegisterResponse({
@@ -35,6 +36,7 @@ class RegisterResponse {
     required this.password,
     this.clientId,
     this.clientSecret,
+    this.merchantId,
     required this.type,
   });
 
@@ -55,6 +57,7 @@ class RegisterResponse {
       'password': password,
       'clientId': clientId,
       'clientSecret': clientSecret,
+      'merchantId': merchantId,
       'type': type,
     };
   }
@@ -76,6 +79,7 @@ class RegisterResponse {
       password: map['password'] as String,
       clientId: map['clientId'] != null ? map['clientId'] as String : null,
       clientSecret: map['clientSecret'] != null ? map['clientSecret'] as String : null,
+      merchantId: map['merchantId'] != null ? map['merchantId'] as String : null,
       type: map['type'] as String,
     );
   }

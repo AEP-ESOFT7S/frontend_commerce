@@ -14,6 +14,7 @@ class AccountController extends GetxController {
 
   final TextEditingController clientIdController = TextEditingController();
   final TextEditingController clientSecretController = TextEditingController();
+  final TextEditingController merchantIdController = TextEditingController();
 
   final TextEditingController firstNameController = TextEditingController();
   final TextEditingController lastNameController = TextEditingController();
@@ -27,17 +28,12 @@ class AccountController extends GetxController {
   final TextEditingController complementController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
 
+  final _isEnableCredentialIfood = false.obs;
+  bool get getIsEnableCredentialIfood => _isEnableCredentialIfood.value;
+  set setIsEnableCredentialIfood(bool value) => _isEnableCredentialIfood.value = value;
+
   @override
   void onInit() async {
-    // final credentials = await _storage.read('credentials');
-
-    // if (credentials != null) {
-    //   final credential = IFoodCredentials.fromJson(credentials);
-
-    //   clientIdController.text = credential.clientId;
-    //   clientSecretController.text = credential.clientSecret;
-    // }
-
     final String user = _storage.read('userData');
 
     final json = RegisterResponse.fromJson(user);
@@ -53,8 +49,9 @@ class AccountController extends GetxController {
     numberController.text = json.number;
     complementController.text = json.complement;
     emailController.text = json.email;
-    clientIdController.text = json.clientId!;
-    clientSecretController.text = json.clientSecret!;
+    clientIdController.text = json.clientId ?? '';
+    clientSecretController.text = json.clientSecret ?? '';
+    merchantIdController.text = json.merchantId ?? '';
 
     super.onInit();
   }
@@ -68,21 +65,24 @@ class AccountController extends GetxController {
   set setIsDarkMode(bool value) => _darkMode.value = value;
 
   Future<void> saveIfoodCredentials() async {
-    IFoodCredentials credentials = IFoodCredentials(
-        clientId: clientIdController.text, clientSecret: clientSecretController.text);
-    if (credentials.clientId.isNotEmpty && credentials.clientSecret.isNotEmpty) {
+    if (clientIdController.text.isNotEmpty &&
+        clientSecretController.text.isNotEmpty &&
+        merchantIdController.text.isNotEmpty) {
       final String user = _storage.read('userData');
 
       RegisterResponse jsonResponse = RegisterResponse.fromJson(user);
       RegisterRequest jsonRequest = RegisterRequest.fromJson(user);
 
-      jsonResponse.clientId = credentials.clientId;
-      jsonResponse.clientSecret = credentials.clientSecret;
-      jsonRequest.clientId = credentials.clientId;
-      jsonRequest.clientSecret = credentials.clientSecret;
+      jsonResponse.clientId = clientIdController.text;
+      jsonResponse.clientSecret = clientSecretController.text;
+      jsonResponse.merchantId = merchantIdController.text;
+      jsonRequest.clientId = clientIdController.text;
+      jsonRequest.clientSecret = clientSecretController.text;
+      jsonRequest.merchantId = merchantIdController.text;
 
       await _accountRepository.saveCredentials(jsonResponse.id, jsonRequest.toJson()).then((value) {
-        _storage.write('userData', jsonResponse);
+        _storage.write('userData', jsonResponse.toJson());
+        setIsEnableCredentialIfood = false;
         ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(value.message)));
       }).catchError((_) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.message)));

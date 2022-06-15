@@ -54,60 +54,80 @@ class HomePage extends GetView<HomeController> {
                         onPressed: () => Get.toNamed('/account'),
                         child: const Text(
                           'Vincular',
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                            inherit: true,
-                          ),
+                          style: TextStyle(decoration: TextDecoration.underline, inherit: true),
                         ),
                       ),
                       GestureDetector(
                         child: const Icon(Icons.close),
-                        onTap: () => controller.toggleRegisterCommerceNotificationIsVisible(),
+                        onTap: () => controller.setRegisterCommerceNotificationIsVisible = false,
                       ),
                     ],
                   ),
                 ),
               ),
             ),
-            ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-              shrinkWrap: true,
-              children: [
-                const Text('Pendentes'),
-                SizedBox(
-                  child: Obx(
-                    () => ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                      itemCount: controller.getPollings.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        return ElevatedButton(
-                          onPressed: () {
-                            controller.confirm(controller.getPollings[index].orderId);
-                          },
-                          child: Text(controller.getPollings[index].orderId),
-                        );
-                      },
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                shrinkWrap: true,
+                children: [
+                  const Text('Pendentes'),
+                  SizedBox(
+                    child: Obx(
+                      () => ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                        itemCount: controller.getPlaced.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return ElevatedButton(
+                            onPressed: () {
+                              controller.confirm(controller.getPlaced[index].orderId);
+                            },
+                            child: Text(controller.getPlaced[index].toJson()),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-                const Text('Confirmados'),
-                SizedBox(
-                  child: Obx(
-                    () => ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                      itemCount: controller.getOrders.length,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        return ElevatedButton(
-                          onPressed: () => controller.confirm(controller.getOrders[index]),
-                          child: Text(controller.getOrders[index]),
-                        );
-                      },
+                  const Text('Confirmados'),
+                  SizedBox(
+                    child: Obx(
+                      () => ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                        itemCount: controller.getOrders.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return ElevatedButton(
+                            onPressed: () =>
+                                controller.dispatch(controller.getOrders[index].orderId),
+                            child: Text(controller.getOrders[index].toString()),
+                          );
+                        },
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  const Text('Outros'),
+                  SizedBox(
+                    child: Obx(
+                      () => ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                        itemCount: controller.getOthers.length,
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return ElevatedButton(
+                            onPressed: () =>
+                                controller.dispatch(controller.getOthers[index].orderId),
+                            child: Text(controller.getOthers[index].toString()),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
