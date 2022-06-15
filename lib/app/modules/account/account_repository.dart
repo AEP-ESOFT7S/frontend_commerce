@@ -7,13 +7,13 @@ import 'package:verydeli_commerce/app/data/provider/api_provider.dart';
 class AccountRepository extends GetConnect {
   final APIProvider _restClient = APIProvider();
 
-  Future saveCredentials(String userId, String registerData) async {
+  Future saveCredentials(String email, String registerData) async {
     try {
-      final response = await _restClient.put('/register/$userId', registerData);
+      final response = await _restClient.put('/users/$email', registerData);
 
       switch (response.statusCode) {
         case HttpStatus.created:
-          return ApiResponse(message: 'Usuário cadastrado com sucesso!');
+          return ApiResponse(message: 'Dados atualizado com sucesso!');
 
         case HttpStatus.ok:
           return ApiResponse(message: 'Dados atualizado com sucesso!');

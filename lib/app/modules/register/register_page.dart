@@ -38,7 +38,7 @@ class RegisterPage extends GetView<RegisterController> {
               TextFormField(
                 controller: controller.cpfController,
                 textInputAction: TextInputAction.next,
-                keyboardType: TextInputType.name,
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'CPF'),
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,
@@ -50,7 +50,7 @@ class RegisterPage extends GetView<RegisterController> {
               TextFormField(
                 controller: controller.phoneController,
                 textInputAction: TextInputAction.next,
-                keyboardType: TextInputType.name,
+                keyboardType: TextInputType.number,
                 decoration: const InputDecoration(labelText: 'Telefone'),
                 inputFormatters: [
                   FilteringTextInputFormatter.digitsOnly,

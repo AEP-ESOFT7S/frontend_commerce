@@ -9,12 +9,13 @@ class RegisterRepository extends GetConnect {
 
   Future<ApiResponse> register(String registerData) async {
     try {
-      final response = await _restClient.postApi('/register', registerData);
+      final response = await _restClient.postApi('/users', registerData);
 
       switch (response.statusCode) {
+        case HttpStatus.ok:
+          return ApiResponse(message: 'Usuário cadastrado com sucesso!');
         case HttpStatus.created:
           return ApiResponse(message: 'Usuário cadastrado com sucesso!');
-
         default:
           throw RestClientException('Falha ao registrar usuário!', code: response.statusCode);
       }

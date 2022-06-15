@@ -45,30 +45,30 @@ class AccountPage extends GetView<AccountController> {
           Obx(() => TextFormField(
                 controller: controller.clientIdController,
                 decoration: const InputDecoration(labelText: 'Client ID'),
-                enabled: controller.getIsEnableCredentialIfood,
+                enabled: controller.getIsEnableEditCredentialIfood,
               )),
           const SizedBox(height: 15),
           Obx(() => TextFormField(
                 controller: controller.clientSecretController,
                 decoration: const InputDecoration(labelText: 'Client Secret'),
-                enabled: controller.getIsEnableCredentialIfood,
+                enabled: controller.getIsEnableEditCredentialIfood,
               )),
           const SizedBox(height: 15),
           Obx(() => TextFormField(
                 controller: controller.merchantIdController,
                 decoration: const InputDecoration(labelText: 'Merchant ID'),
-                enabled: controller.getIsEnableCredentialIfood,
+                enabled: controller.getIsEnableEditCredentialIfood,
               )),
           const SizedBox(height: 20),
           Obx(() => ElevatedButton(
                 onPressed: () {
-                  if (controller.getIsEnableCredentialIfood) {
+                  if (controller.getIsEnableEditCredentialIfood) {
                     controller.saveIfoodCredentials();
                   } else {
-                    controller.setIsEnableCredentialIfood = true;
+                    controller.setIsEnableEditCredentialIfood = true;
                   }
                 },
-                child: Text(controller.getIsEnableCredentialIfood ? 'Salvar' : 'Editar'),
+                child: Text(controller.getIsEnableEditCredentialIfood ? 'Salvar' : 'Editar'),
               )),
           const SizedBox(height: 40),
           const Text('Dados do usuário', style: TextStyle(fontWeight: FontWeight.bold)),

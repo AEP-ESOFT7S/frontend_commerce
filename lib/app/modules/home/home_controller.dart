@@ -16,7 +16,7 @@ class HomeController extends GetxController {
   get getDeliveryNotificationIsVisible => deliveryNotificationIsVisible.value;
   set setDeliveryNotificationIsVisible(bool value) => deliveryNotificationIsVisible.value = value;
 
-  final _registerCommerceNotificationIsVisible = false.obs;
+  final _registerCommerceNotificationIsVisible = true.obs;
   get getRegisterCommerceNotificationIsVisible => _registerCommerceNotificationIsVisible.value;
   set setRegisterCommerceNotificationIsVisible(bool value) =>
       _registerCommerceNotificationIsVisible.value = value;
@@ -70,13 +70,20 @@ class HomeController extends GetxController {
 
   @override
   void onInit() async {
+    final String userData = _storage.read('userData') ?? '';
+    RegisterResponse user = RegisterResponse.fromJson(userData);
+    setRegisterCommerceNotificationIsVisible = true;
+    if (user.clientId!.isNotEmpty && user.clientSecret!.isNotEmpty && user.merchantId!.isNotEmpty) {
+      setRegisterCommerceNotificationIsVisible = false;
+    }
+
     final DateTime dateTimeNow = DateTime.now().toLocal();
 
     _accessToken = _storage.read('accessToken') ?? '';
-    _expiresAt = DateTime.parse(_storage.read('expiresAt'));
+    _expiresAt = DateTime.parse(_storage.read('expiresAt') ?? _expiresAt.toString());
 
     if (_accessToken.isEmpty && dateTimeNow.isAfter(_expiresAt)) {
-      await _getAuthorization();
+      await _getAuthorization(user);
     }
 
     await _getPolling(_accessToken);
@@ -84,7 +91,7 @@ class HomeController extends GetxController {
 
     Timer.periodic(const Duration(seconds: 30), (Timer t) async {
       if (_accessToken.isEmpty && dateTimeNow.isAfter(_expiresAt)) {
-        await _getAuthorization();
+        await _getAuthorization(user);
       }
 
       await _getPolling(_accessToken);
@@ -94,14 +101,9 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
-  Future<void> _getAuthorization() async {
-    final String userData = _storage.read('userData') ?? '';
-    RegisterResponse register = RegisterResponse.fromJson(userData);
-
-    if (register.clientId!.isNotEmpty &&
-        register.clientSecret!.isNotEmpty &&
-        register.merchantId!.isNotEmpty) {
-      await _homeRepository.authorization(register).then((value) {
+  Future<void> _getAuthorization(RegisterResponse user) async {
+    if (user.clientId!.isNotEmpty && user.clientSecret!.isNotEmpty && user.merchantId!.isNotEmpty) {
+      await _homeRepository.authorization(user).then((value) {
         final dateTimeNow = DateTime.now().toLocal();
 
         _accessToken = value.result['accessToken'];
@@ -113,8 +115,6 @@ class HomeController extends GetxController {
       }).catchError((_) {
         ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(_.message)));
       });
-    } else {
-      _registerCommerceNotificationIsVisible.value = true;
     }
   }
 
@@ -148,12 +148,14 @@ class HomeController extends GetxController {
   }
 
   Future<void> _getAcknowledgment(String accessToken) async {
-    await _homeRepository
-        .acknowledgment(accessToken, _toAcknowledgment)
-        .then((value) {})
-        .catchError((erro) {
-      ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(erro.message)));
-    });
+    if (_toAcknowledgment.isNotEmpty) {
+      await _homeRepository
+          .acknowledgment(accessToken, _toAcknowledgment)
+          .then((value) {})
+          .catchError((erro) {
+        ScaffoldMessenger.of(Get.context!).showSnackBar(SnackBar(content: Text(erro.message)));
+      });
+    }
   }
 
   Future<void> confirm(String orderId) async {

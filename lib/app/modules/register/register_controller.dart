@@ -37,7 +37,7 @@ class RegisterController extends GetxController {
         complement: complementController.text,
         email: emailController.text,
         password: passwordController.text,
-        type: 'commerce',
+        type: 'merchant',
       );
 
       await _registerRepository.register(user.toJson()).then((value) {
