@@ -3,7 +3,6 @@ import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:verydeli_commerce/app/core/exceptions/rest_client_exception.dart';
 import 'package:verydeli_commerce/app/data/models/api_response.dart';
-import 'package:verydeli_commerce/app/data/models/polling_response.dart';
 import 'package:verydeli_commerce/app/data/models/register_response.dart';
 import 'package:verydeli_commerce/app/data/provider/api_provider.dart';
 
@@ -12,22 +11,14 @@ class HomeRepository extends GetConnect {
 
   final _storage = GetStorage();
 
-  Future<ApiResponse> authorization() async {
+  Future<ApiResponse> authorization(RegisterResponse user) async {
     try {
-      final userData = await _storage.read('userData');
-
-      RegisterResponse register = RegisterResponse.fromJson(userData);
-
-      if (register.clientId!.isEmpty && register.clientSecret!.isEmpty) {
-        throw RestClientException('Conta ainda sem vínculo a um comércio!', code: 0);
-      }
-
       final response = await _restClient.postApi(
         '/authentication/v1.0/oauth/token',
         {
           'grantType': 'client_credentials',
-          'clientId': register.clientId,
-          'clientSecret': register.clientSecret,
+          'clientId': user.clientId,
+          'clientSecret': user.clientSecret,
         },
         contentType: 'application/x-www-form-urlencoded',
       );
@@ -36,20 +27,21 @@ class HomeRepository extends GetConnect {
         case HttpStatus.ok:
           return ApiResponse(result: response.body);
         default:
-          throw RestClientException('Falha ao registrar usuário!', code: response.statusCode);
+          throw RestClientException('Falha ao autorizar usuário!', code: response.statusCode);
       }
     } on RestClientException catch (exception) {
       throw RestClientException(exception.message, code: exception.code);
     }
   }
 
-  Future<ApiResponse> polling() async {
+  Future<ApiResponse> polling(String accessToken) async {
     try {
-      final String token = _storage.read('accessToken') ?? '';
-
       final response = await _restClient.getApi(
         '/order/v1.0/events:polling',
-        headers: {'authorization': 'Bearer $token'},
+        headers: {
+          'authorization': 'Bearer $accessToken',
+          // 'merchantId': merchantId,
+        },
       );
 
       switch (response.statusCode) {
@@ -65,20 +57,12 @@ class HomeRepository extends GetConnect {
     }
   }
 
-  Future<ApiResponse> acknowledgment(List<PollingResponse> pollings) async {
+  Future<ApiResponse> acknowledgment(String accessToken, String pollings) async {
     try {
-      String json = '';
-      for (var element in pollings) {
-        var map = '{"id": "${element.id}"}';
-        json += json.isEmpty ? map : ', $map';
-      }
-
-      final token = _storage.read('accessToken') ?? '';
-
       final response = await _restClient.postApi(
         '/order/v1.0/events/acknowledgment',
-        '[$json]',
-        headers: {'authorization': 'Bearer $token'},
+        '[$pollings]',
+        headers: {'authorization': 'Bearer $accessToken'},
       );
 
       switch (response.statusCode) {
