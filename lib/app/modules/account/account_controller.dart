@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:verydeli_commerce/app/data/models/register_request.dart';
-import 'package:verydeli_commerce/app/data/models/register_response.dart';
+import 'package:verydeli_commerce/app/data/models/user_request.dart';
+import 'package:verydeli_commerce/app/data/models/user_response.dart';
 import 'package:verydeli_commerce/app/modules/account/account_repository.dart';
 
 class AccountController extends GetxController {
@@ -12,13 +12,12 @@ class AccountController extends GetxController {
 
   final AccountRepository _accountRepository = AccountRepository();
 
+  final TextEditingController corporateNameController = TextEditingController();
+  final TextEditingController cnpjController = TextEditingController();
   final TextEditingController clientIdController = TextEditingController();
   final TextEditingController clientSecretController = TextEditingController();
   final TextEditingController merchantIdController = TextEditingController();
 
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController cpfController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController cepController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
@@ -36,11 +35,14 @@ class AccountController extends GetxController {
   void onInit() async {
     final String user = _storage.read('userData');
 
-    final json = RegisterResponse.fromJson(user);
+    final json = UserResponse.fromJson(user);
 
-    firstNameController.text = json.firstName;
-    lastNameController.text = json.lastName;
-    cpfController.text = json.cpf;
+    corporateNameController.text = json.corporateName;
+    cnpjController.text = json.cnpj;
+    clientIdController.text = json.clientId ?? '';
+    clientSecretController.text = json.clientSecret ?? '';
+    merchantIdController.text = json.merchantId ?? '';
+
     phoneController.text = json.phone;
     cepController.text = json.cep;
     cityController.text = json.city;
@@ -49,9 +51,6 @@ class AccountController extends GetxController {
     numberController.text = json.number;
     complementController.text = json.complement;
     emailController.text = json.email;
-    clientIdController.text = json.clientId ?? '';
-    clientSecretController.text = json.clientSecret ?? '';
-    merchantIdController.text = json.merchantId ?? '';
 
     super.onInit();
   }
@@ -67,12 +66,13 @@ class AccountController extends GetxController {
   Future<void> saveIfoodCredentials() async {
     final String user = _storage.read('userData');
 
-    RegisterResponse jsonResponse = RegisterResponse.fromJson(user);
-    RegisterRequest jsonRequest = RegisterRequest.fromJson(user);
+    UserResponse jsonResponse = UserResponse.fromJson(user);
+    UserRequest jsonRequest = UserRequest.fromJson(user);
 
     jsonResponse.clientId = clientIdController.text;
     jsonResponse.clientSecret = clientSecretController.text;
     jsonResponse.merchantId = merchantIdController.text;
+
     jsonRequest.clientId = clientIdController.text;
     jsonRequest.clientSecret = clientSecretController.text;
     jsonRequest.merchantId = merchantIdController.text;
