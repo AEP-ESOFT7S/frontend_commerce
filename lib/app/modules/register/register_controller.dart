@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:verydeli_commerce/app/data/models/register_request.dart';
+import 'package:verydeli_commerce/app/data/models/user_request.dart';
 import 'package:verydeli_commerce/app/modules/register/register_repository.dart';
 
 class RegisterController extends GetxController {
@@ -8,9 +8,8 @@ class RegisterController extends GetxController {
 
   final RegisterRepository _registerRepository = RegisterRepository();
 
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController cpfController = TextEditingController();
+  final TextEditingController corporateNameController = TextEditingController();
+  final TextEditingController cnpjController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController cepController = TextEditingController();
   final TextEditingController cityController = TextEditingController();
@@ -24,10 +23,9 @@ class RegisterController extends GetxController {
 
   Future<void> register() async {
     if (formKey.currentState!.validate()) {
-      final user = RegisterRequest(
-        firstName: firstNameController.text,
-        lastName: lastNameController.text,
-        cpf: cpfController.text,
+      final user = UserRequest(
+        corporateName: corporateNameController.text,
+        cnpj: cnpjController.text.replaceAll(RegExp("[^0-9]"), ""),
         phone: phoneController.text,
         cep: cepController.text,
         city: cityController.text,

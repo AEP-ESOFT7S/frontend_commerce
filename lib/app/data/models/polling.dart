@@ -1,13 +1,13 @@
 import 'dart:convert';
 
-class PollingResponse {
+class Polling {
   String id;
   String orderId;
   String code;
   String fullCode;
   DateTime createdAt;
 
-  PollingResponse({
+  Polling({
     required this.id,
     required this.orderId,
     required this.code,
@@ -25,8 +25,8 @@ class PollingResponse {
     };
   }
 
-  factory PollingResponse.fromMap(Map<String, dynamic> map) {
-    return PollingResponse(
+  factory Polling.fromMap(Map<String, dynamic> map) {
+    return Polling(
       id: map['id'] ?? '',
       orderId: map['orderId'] ?? '',
       code: map['code'] ?? '',
@@ -37,5 +37,5 @@ class PollingResponse {
 
   String toJson() => json.encode(toMap());
 
-  factory PollingResponse.fromJson(String source) => PollingResponse.fromMap(json.decode(source));
+  factory Polling.fromJson(String source) => Polling.fromMap(json.decode(source));
 }

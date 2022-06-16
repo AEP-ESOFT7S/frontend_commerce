@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:verydeli_commerce/app/data/models/polling_response.dart';
-import 'package:verydeli_commerce/app/data/models/register_response.dart';
+import 'package:verydeli_commerce/app/data/models/polling.dart';
+import 'package:verydeli_commerce/app/data/models/user_response.dart';
 import 'package:verydeli_commerce/app/modules/home/home_repository.dart';
 
 class HomeController extends GetxController {
@@ -27,9 +27,9 @@ class HomeController extends GetxController {
 
   final registerCommerceMessage = 'Conta ainda sem vínculo a um comércio!';
 
-  final _placed = <PollingResponse>[].obs;
-  List<PollingResponse> get getPlaced => _placed.toList();
-  void addPlaced(PollingResponse value) {
+  final _placed = <Polling>[].obs;
+  List<Polling> get getPlaced => _placed.toList();
+  void addPlaced(Polling value) {
     getPlaced.singleWhere(
       (element) => element.orderId == value.orderId,
       orElse: () {
@@ -39,10 +39,10 @@ class HomeController extends GetxController {
     );
   }
 
-  final _orders = <PollingResponse>[].obs;
-  List<PollingResponse> get getOrders => _orders.toList();
-  set setOrders(List<PollingResponse> value) => _orders.value = value;
-  void addOrders(PollingResponse value) {
+  final _orders = <Polling>[].obs;
+  List<Polling> get getOrders => _orders.toList();
+  set setOrders(List<Polling> value) => _orders.value = value;
+  void addOrders(Polling value) {
     getOrders.singleWhere(
       (element) => element.orderId == value.orderId,
       orElse: () {
@@ -52,10 +52,10 @@ class HomeController extends GetxController {
     );
   }
 
-  final _others = <PollingResponse>[].obs;
-  List<PollingResponse> get getOthers => _others.toList();
-  set setOthers(List<PollingResponse> value) => _others.value = value;
-  void addOthers(PollingResponse value) {
+  final _others = <Polling>[].obs;
+  List<Polling> get getOthers => _others.toList();
+  set setOthers(List<Polling> value) => _others.value = value;
+  void addOthers(Polling value) {
     getOthers.singleWhere(
       (element) => element.orderId == value.orderId,
       orElse: () {
@@ -71,9 +71,9 @@ class HomeController extends GetxController {
   @override
   void onInit() async {
     final String userData = _storage.read('userData') ?? '';
-    RegisterResponse user = RegisterResponse.fromJson(userData);
+    UserResponse user = UserResponse.fromJson(userData);
     setRegisterCommerceNotificationIsVisible = true;
-    if (user.clientId!.isNotEmpty && user.clientSecret!.isNotEmpty && user.merchantId!.isNotEmpty) {
+    if (user.clientId != null && user.clientSecret != null && user.merchantId != null) {
       setRegisterCommerceNotificationIsVisible = false;
     }
 
@@ -101,7 +101,7 @@ class HomeController extends GetxController {
     super.onInit();
   }
 
-  Future<void> _getAuthorization(RegisterResponse user) async {
+  Future<void> _getAuthorization(UserResponse user) async {
     if (user.clientId!.isNotEmpty && user.clientSecret!.isNotEmpty && user.merchantId!.isNotEmpty) {
       await _homeRepository.authorization(user).then((value) {
         final dateTimeNow = DateTime.now().toLocal();
@@ -121,7 +121,7 @@ class HomeController extends GetxController {
   Future<void> _getPolling(String accessToken) async {
     await _homeRepository.polling(accessToken).then((value) async {
       for (var element in value.result) {
-        var values = PollingResponse.fromMap(element);
+        var values = Polling.fromMap(element);
 
         _generateListToAcknowledgment(values.orderId);
 
@@ -160,7 +160,7 @@ class HomeController extends GetxController {
 
   Future<void> confirm(String orderId) async {
     await _homeRepository.confirmOrder(orderId).then((value) {
-      final List<PollingResponse> listOrders = _storage.read('pollings');
+      final List<Polling> listOrders = _storage.read('pollings');
 
       listOrders.removeWhere((element) => element.orderId == orderId);
       _storage.write('pollings', listOrders);

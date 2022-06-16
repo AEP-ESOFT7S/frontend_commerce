@@ -1,3 +1,0 @@
-class OrderResponse {
-  // final String
-}

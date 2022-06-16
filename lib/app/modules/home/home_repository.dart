@@ -3,7 +3,7 @@ import 'package:get/get_connect/http/src/status/http_status.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:verydeli_commerce/app/core/exceptions/rest_client_exception.dart';
 import 'package:verydeli_commerce/app/data/models/api_response.dart';
-import 'package:verydeli_commerce/app/data/models/register_response.dart';
+import 'package:verydeli_commerce/app/data/models/user_response.dart';
 import 'package:verydeli_commerce/app/data/provider/api_provider.dart';
 
 class HomeRepository extends GetConnect {
@@ -11,7 +11,7 @@ class HomeRepository extends GetConnect {
 
   final _storage = GetStorage();
 
-  Future<ApiResponse> authorization(RegisterResponse user) async {
+  Future<ApiResponse> authorization(UserResponse user) async {
     try {
       final response = await _restClient.post(
         '/authentication/v1.0/oauth/token',
